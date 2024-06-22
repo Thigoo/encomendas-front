@@ -1,5 +1,7 @@
+import { User } from "../User";
+
 export interface AuthContextType {
   isAuthenticated: boolean;
-  login: (username: string, password: string) => void;
+  login: (user: User) => void;
   logout: () => void;
 }

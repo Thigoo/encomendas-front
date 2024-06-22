@@ -1,22 +1,22 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { UserContextType } from "../../models/UserContextType";
 import { UserProviderProps } from "../../models/UserProviderProps";
 import { User } from "../../models/User";
+import { register as apiRegister } from "../../services/api";
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [users, setUsers] = useState<User[]>(() => {
-    const storedUsers = localStorage.getItem("users");
-    return storedUsers ? JSON.parse(storedUsers) : [];
-  });
+  const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(() => {
-    localStorage.setItem("users", JSON.stringify(users));
-  }, [users]);
-
-  const register = (user: User) => {
-    setUsers((prevUsers) => [...prevUsers, user]);
+  const register = async (user: User) => {
+    try {
+      const newUser = await apiRegister(user);
+      setUsers((prevUsers) => [...prevUsers, newUser]);
+    } catch (error) {
+      console.error("Erro ao registrar usuário: ", error);
+      
+    }
   };
 
   return (
@@ -26,11 +26,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   );
 };
 
-export const useUser = () => {
-     const context = useContext(UserContext);
+export const useUser = (): UserContextType => {
+  const context = useContext(UserContext);
 
-     if(!context) {
-          throw new Error("useUser must be used within a UserProvider");
-     }
-     return context;
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
 };

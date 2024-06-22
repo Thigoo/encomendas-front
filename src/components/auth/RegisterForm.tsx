@@ -2,18 +2,25 @@ import React, { useState } from "react";
 import { useUser } from "../../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button, Container, Link, TextField, Typography } from "@mui/material";
+import { User } from "../../models/User";
 
 const RegisterForm: React.FC = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { register } = useUser();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
      e.preventDefault();
-     register({username, email, password});
-     navigate("/login");
+     try {
+          const newUser: User = {name, email, password};
+          await register(newUser);
+          navigate("/");
+     } catch (error) {
+          console.error('Erro ao registrar: ', error);
+          
+     }
   }
 
   return (
@@ -32,8 +39,8 @@ const RegisterForm: React.FC = () => {
                label="Nome"
                fullWidth
                margin="normal"
-               value={username}
-               onChange={(e) => setUsername(e.target.value)}
+               value={name}
+               onChange={(e) => setName(e.target.value)}
                />
                <TextField 
                label="Email"
