@@ -11,7 +11,7 @@ function AppRouter() {
       <Route path="/register" element={<RegisterPage />} />
       <Route
         path="/dashboard"
-        element={<ProtectedRoute element={<Dashboard />} path="/dashboard" />}
+        element={<ProtectedRoute element={<Dashboard />} />}
       />
     </Routes>
   );

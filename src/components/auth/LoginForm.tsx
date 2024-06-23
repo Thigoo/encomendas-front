@@ -1,18 +1,31 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { Button, Container, TextField, Typography, Link } from "@mui/material";
+import { User } from "../../models/User";
 
 const LoginForm: React.FC = () => {
-  const [username, setUsename] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useAuth();
-  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     console.log("Usuário autenticado", isAuthenticated);
+
+      
+  //   }
+  // }, [isAuthenticated, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(username, password);
-    navigate("/dashboard");
+    
+    try {
+      const user: User = { email, password };
+      await login(user);
+      
+    } catch (error) {
+      console.error("Erro ao fazer login: ", error);
+    }
   };
 
   return (
@@ -22,11 +35,11 @@ const LoginForm: React.FC = () => {
       </Typography>
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Usuário"
+          label="Email"
           fullWidth
           margin="normal"
-          value={username}
-          onChange={(e) => setUsename(e.target.value)}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
           label="Senha"
@@ -36,16 +49,22 @@ const LoginForm: React.FC = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <Button 
+        <Button
           type="submit"
-         variant="contained" 
-         color="primary" 
-         size="large"
-         sx={{ marginTop: "1rem" }}
-         fullWidth>
+          variant="contained"
+          color="primary"
+          size="large"
+          sx={{ marginTop: "1rem" }}
+          fullWidth
+        >
           Login
         </Button>
-        <Typography variant="body1" component="p" gutterBottom style={{marginTop: "1rem"}}>
+        <Typography
+          variant="body1"
+          component="p"
+          gutterBottom
+          style={{ marginTop: "1rem" }}
+        >
           Não possui uma conta? <Link href="/register">Registre-se</Link>
         </Typography>
       </form>

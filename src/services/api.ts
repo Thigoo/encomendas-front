@@ -7,14 +7,16 @@ export const api = axios.create({
 
 interface LoginResponse {
   token: string;
+  userData: User;
 }
 
 export const login = async (user: User): Promise<LoginResponse> => {
-  const { name, password } = user;
-  const response = await api.post<LoginResponse>("/login", {
-    name,
+  const { email, password } = user;
+  const response = await api.post<LoginResponse>("/auth/login", {
+    email,
     password,
   });
+  
   return response.data;
 };
 
@@ -24,7 +26,11 @@ export const register = async (user: User) => {
   return response.data;
 };
 
-export const fetchUsers = async () => {
-  const response = await api.get("/users");
+export const fetChUserData = async (token: string): Promise<User> => {
+  const response = await api.get("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
   return response.data;
 };
