@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContextType } from "../../models/AuthContextType";
 import { AuthProviderProps } from "../../models/AuthContextProps";
-import { login as apiLogin, fetChUserData } from "../../services/api";
+import { login as apiLogin, fetchUserData } from "../../services/api";
 import { User } from "../../models/User";
 import { useNavigate } from "react-router-dom";
 
@@ -16,7 +16,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      fetChUserData(JSON.parse(token))
+      fetchUserData(JSON.parse(token))
         .then((userData) => {
           setUser(userData);
           setIsAuthenticated(true);
@@ -34,18 +34,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (user: User) => {
     try {
-      // const {name, password} = user;
       const { token, userData } = await apiLogin(user);      
       
-      setIsAuthenticated(true);
+      localStorage.setItem("token", token);
       setUser(userData);
+      setIsAuthenticated(true);
 
-      localStorage.setItem("token", JSON.stringify(token));
       navigate("/dashboard");
-      console.log("Login bem sucedido, token: ", token);
-      console.log("Login bem sucedido, dados do usuário: ", userData);
+
+      setTimeout(() => {
+        console.log("Login bem sucedido, token: ", token);
+        console.log("Login bem sucedido, dados do usuário: ", userData);
+      }, 1000);
+      
     } catch (error) {
       console.log("Erro ao fazer login", error);
+      throw error;
     }
   };
 
@@ -54,17 +58,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     localStorage.removeItem("token");
   };
-
+  
+  const loadUserData = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Token não encontrado');
+    }
+  
+    try {
+      const userData = await fetchUserData(token);
+      setUser(userData);
+    } catch (error) {
+      console.error('Erro ao buscar dados do usuário:', error);
+      throw error;
+    }
+  };
+  
   if (loading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, user }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, user, loadUserData }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
