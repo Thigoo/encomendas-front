@@ -1,11 +1,26 @@
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { Button, Container, TextField, Typography, Link } from "@mui/material";
+import { Button, Container, TextField, Typography, Link, CircularProgress } from "@mui/material";
 import { User } from "../../models/User";
+import * as yup from 'yup';
+import {toast} from 'react-toastify';
+
+const loginSchema = yup.object().shape({
+  email: yup.string().email('Email inválido').required('Email obrigatório'),
+  password: yup.string().min(3, 'A senha deve ter pelo menos 3 digitos').required('A senha é obrigatória'),
+});
+
+interface IFormData {
+  email?: string;
+  password?: string;
+  serverError?: string;
+}
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errors, setErrors] = useState<IFormData>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
 
   // useEffect(() => {
@@ -18,13 +33,28 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+    setIsSubmitting(true);
     
     try {
       const user: User = { email, password };
+      await loginSchema.validate(user, { abortEarly: false });
       await login(user);
+      toast.success('Login bem-sucedido!');
       
-    } catch (error) {
-      console.error("Erro ao fazer login: ", error);
+    } catch (error: any) {
+      if(error instanceof yup.ValidationError) {
+        const validationErrors: IFormData = {};
+        error.inner.forEach((err: any) => {
+          validationErrors[err.path as keyof IFormData] = err.message;
+        })
+        setErrors(validationErrors);
+      } else if(error.response && error.response.status === 401) {
+        // toast.error('Email ou senha incorretos');
+        setErrors({ serverError: 'Email ou senha incorretos' });
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -40,6 +70,8 @@ const LoginForm: React.FC = () => {
           margin="normal"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          error={!!errors.email}
+          helperText={errors.email}
         />
         <TextField
           label="Senha"
@@ -48,7 +80,10 @@ const LoginForm: React.FC = () => {
           margin="normal"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          error={!!errors.password}
+          helperText={errors.password}
         />
+        {errors.serverError && <Typography fontSize={"0.8rem"}  color="error">{errors.serverError}</Typography>}
         <Button
           type="submit"
           variant="contained"
@@ -56,8 +91,9 @@ const LoginForm: React.FC = () => {
           size="large"
           sx={{ marginTop: "1rem" }}
           fullWidth
+          disabled={isSubmitting}
         >
-          Login
+          {isSubmitting ? <CircularProgress size={24} /> : "Login"}
         </Button>
         <Typography
           variant="body1"
