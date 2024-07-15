@@ -23,14 +23,6 @@ const LoginForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
 
-  // useEffect(() => {
-  //   if (isAuthenticated) {
-  //     console.log("Usuário autenticado", isAuthenticated);
-
-      
-  //   }
-  // }, [isAuthenticated, navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
@@ -39,7 +31,7 @@ const LoginForm: React.FC = () => {
     try {
       const user: User = { email, password };
       await loginSchema.validate(user, { abortEarly: false });
-      await login(user);
+      login(user);
       toast.success('Login bem-sucedido!');
       
     } catch (error: any) {
