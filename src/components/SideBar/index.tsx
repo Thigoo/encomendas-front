@@ -16,7 +16,6 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import LogoutModal from "../LogoutModal";
 import { Inventory2, LocalShipping, Logout } from "@mui/icons-material";
 
@@ -96,7 +95,7 @@ export default function MiniDrawer() {
   const [open, setOpen] = React.useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
   const { logout } = useAuth();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleDrawerOpen = () => {
     setOpen(true);
