@@ -1,11 +1,13 @@
 import React from "react";
-import MiniDrawer from "../../components/SideBar";
+import { MiniDrawer } from "../../components/SideBar";
 
-const Home: React.FC = () => {
+interface HomeProps {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
 
-  return (
-    <MiniDrawer />
-  );
+const Home: React.FC<HomeProps> = ({isDarkMode, toggleDarkMode}) => {
+  return <MiniDrawer isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode}/>;
 };
 
 export default Home;
