@@ -18,6 +18,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { useAuth } from "../../context/AuthContext";
 import LogoutModal from "../LogoutModal";
 import { Inventory2, LocalShipping, Logout } from "@mui/icons-material";
+import { Switch } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -90,7 +91,12 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function MiniDrawer() {
+interface MiniDrawerProps {
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
+}
+
+export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMode}) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
@@ -145,7 +151,12 @@ export default function MiniDrawer() {
           </IconButton>
           <Typography variant="h6" noWrap component="div">
             Hello User
-          </Typography>
+          </Typography> 
+          <Switch 
+            checked={isDarkMode}
+            onChange={toggleDarkMode}
+            inputProps={{ 'aria-label': 'controlled' }}
+          />         
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
