@@ -31,7 +31,7 @@ const LoginForm: React.FC = () => {
     try {
       const user: User = { email, password };
       await loginSchema.validate(user, { abortEarly: false });
-      login(user);
+      await login(user);
       toast.success('Login bem-sucedido!');
       
     } catch (error: any) {
@@ -41,7 +41,7 @@ const LoginForm: React.FC = () => {
           validationErrors[err.path as keyof IFormData] = err.message;
         })
         setErrors(validationErrors);
-      } else if(error.response && error.response.status === 401) {
+      } else {
         // toast.error('Email ou senha incorretos');
         setErrors({ serverError: 'Email ou senha incorretos' });
       }
@@ -75,7 +75,12 @@ const LoginForm: React.FC = () => {
           error={!!errors.password}
           helperText={errors.password}
         />
-        {errors.serverError && <Typography fontSize={"0.8rem"}  color="error">{errors.serverError}</Typography>}
+        {errors.serverError && 
+          <Typography 
+            fontSize={"0.8rem"}  
+            color="error">{errors.serverError}
+          </Typography>
+        }
         <Button
           type="submit"
           variant="contained"
