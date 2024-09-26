@@ -96,12 +96,14 @@ interface MiniDrawerProps {
   toggleDarkMode: () => void;
 }
 
-export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMode}) => {
+export const MiniDrawer: React.FC<MiniDrawerProps> = ({
+  isDarkMode,
+  toggleDarkMode,
+}) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
   const [logoutDialogOpen, setLogoutDialogOpen] = React.useState(false);
-  const { logout } = useAuth();
-  // const navigate = useNavigate();
+  const { logout, user, isAuthenticated } = useAuth();
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -119,9 +121,9 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
     logout();
   };
 
-  const menuItemsTop = [    
-    { text: "Encomendas", icon: <LocalShipping />,  },
-    { text: "Produtos", icon: <Inventory2 />,  },    
+  const menuItemsTop = [
+    { text: "Encomendas", icon: <LocalShipping /> },
+    { text: "Produtos", icon: <Inventory2 /> },
   ];
 
   const menuItemsBottom = [
@@ -129,8 +131,8 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
       text: "Sair do App",
       icon: <Logout />,
       action: handleLogoutDialogOpen,
-    },    
-  ]
+    },
+  ];
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -150,13 +152,13 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Hello User
-          </Typography> 
-          <Switch 
+            Hello {isAuthenticated && user?.name}
+          </Typography>
+          <Switch
             checked={isDarkMode}
             onChange={toggleDarkMode}
-            inputProps={{ 'aria-label': 'controlled' }}
-          />         
+            inputProps={{ "aria-label": "controlled" }}
+          />
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>
@@ -171,11 +173,7 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
         </DrawerHeader>
         <List>
           {menuItemsTop.map((item, index) => (
-            <ListItem
-              key={item.text}
-              disablePadding
-              sx={{ display: "block" }}
-            >
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
@@ -203,25 +201,28 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
         <Box sx={{ flexGrow: 1 }} />
         <List>
           {menuItemsBottom.map((item, index) => (
-            <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+            <ListItem key={item.text} disablePadding sx={{ display: "block" }}>
               <ListItemButton
                 sx={{
                   minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
+                  justifyContent: open ? "initial" : "center",
                   px: 2.5,
                 }}
-                onClick={() => item.action()}                
+                onClick={() => item.action()}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
                   }}
                 >
                   {item.icon}
                 </ListItemIcon>
-                <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+                <ListItemText
+                  primary={item.text}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -266,4 +267,4 @@ export const MiniDrawer: React.FC<MiniDrawerProps> = ({isDarkMode, toggleDarkMod
       />
     </Box>
   );
-}
+};
